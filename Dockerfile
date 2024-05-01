@@ -4,6 +4,9 @@ FROM golang:1.15-alpine as builder
 # Set the Current Working Directory inside the container
 WORKDIR /app
 
+# Install Git
+RUN apk update && apk add --no-cache git
+
 # Copy go mod and sum files
 COPY go.mod go.sum ./
 
