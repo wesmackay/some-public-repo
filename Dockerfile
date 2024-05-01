@@ -1,39 +1,32 @@
-FROM golang:alpine AS builder
+# Use the official Golang image as a base image
+FROM golang:1.16-alpine as builder
 
-# Set necessary environmet variables needed for our image
-ENV GO111MODULE=on \
-    CGO_ENABLED=0 \
-    GOOS=linux \
-    GOARCH=amd64
-
-# Move to working directory /app
+# Set the Current Working Directory inside the container
 WORKDIR /app
 
-# Copy and download dependency using go mod
-COPY go.mod .
-COPY go.sum .
+# Copy go mod and sum files
+COPY go.mod go.sum ./
+
+# Download all dependencies. Dependencies will be cached if the go.mod and go.sum files are not changed
 RUN go mod download
 
-# Copy the code into the container
+# Copy the source code from the current directory to the Working Directory inside the container
 COPY . .
 
-# Build the application
-RUN go version
-RUN go build -o main .
+# Build the GoVWA executable
+RUN go build -o govwa .
 
-# Move to /dist directory as the place for resulting binary folder
-WORKDIR /dist
+# Start a new stage from scratch
+FROM alpine:latest  
 
-# Copy binary from build to main folder
-RUN cp /app/main .
+# Set necessary environment variables
+ENV PORT=80
 
-# Build a small image
-FROM scratch
+# Copy the Pre-built binary file from the previous stage
+COPY --from=builder /app/govwa /app/govwa
 
-COPY --from=builder /dist/main /
-COPY ./config/config.json /config/config.json
-COPY ./templates/* /templates/
-COPY ./public/. /public/
-EXPOSE 8888
-# Command to run
-CMD ["./main"]
+# Expose port 80 to the outside world
+EXPOSE 80
+
+# Command to run the executable
+CMD ["/app/govwa"]
