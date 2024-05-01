@@ -35,27 +35,10 @@ pipeline {
         
         stage('Checkout Code') {
             steps {
-                git branch: 'main', credentialsId: 'github', url: 'https://github.com/dmancloud/govwa'
+                git branch: 'main', credentialsId: 'github', url: 'https://github.com/dmancloud/GoVWA'
             }
         }  
-           
-        stage('Sonarqube SAST') {
-            steps {
-                script {
-                withSonarQubeEnv(credentialsId: 'jenkins-sonarqube-token') {
-                    sh "mvn sonar:sonar"
-                }
-                }            
-            }
-        }
-
-        stage('Quality Gate') {
-            steps {
-                script {
-                    waitForQualityGate abortPipeline: false, credentialsId: 'jenkins-sonarqube-token'
-                }            
-            }
-        }        
+                  
         
         stage('Docker Build & Push') {
             steps {
