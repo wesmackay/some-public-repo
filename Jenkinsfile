@@ -1,9 +1,6 @@
 pipeline {
     agent any
 
-    tools {
-
-    }
 
     environment {
         APP_NAME = "govwa"
