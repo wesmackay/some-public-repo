@@ -1,5 +1,5 @@
 # Use the official Golang image as a base image
-FROM golang:1.22.2-alpine as builder
+FROM golang:1.15-alpine as builder
 
 # Set the Current Working Directory inside the container
 WORKDIR /app
@@ -30,3 +30,6 @@ EXPOSE 80
 
 # Command to run the executable
 CMD ["/app/govwa"]
+
+# Clean up unnecessary files and directories
+RUN rm -rf /app/go.mod /app/go.sum /app/*.go /app/.git
